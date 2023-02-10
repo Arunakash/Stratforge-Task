@@ -20,7 +20,7 @@ const SplaScreen = (props) =>{
       getAuth()
     },[])
     return(<View style={{flex:1,alignItems:'center',justifyContent:'center'}}>
-        <Text style={{fontSize:18,fontWeight:'bold',color:"#6A5ACD"}}>To Do App</Text>
+        <Text style={{fontSize:18,fontWeight:'bold',color:"#6A5ACD"}}>SpaceX</Text>
     </View>)
 }
 
