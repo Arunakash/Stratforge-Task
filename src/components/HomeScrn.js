@@ -1,95 +1,169 @@
 import React,{useState,useEffect} from 'react';
-import { Button ,View,Text,Platform,StatusBar,TextInput,Dimensions} from 'react-native';
+import { Button ,View,Text,Platform,StatusBar,TextInput,Dimensions, ImageBackground,Image,StyleSheet} from 'react-native';
 import { FlatList, ScrollView } from 'react-native-gesture-handler';
-import Header from './Header';
-import  Entypo  from 'react-native-vector-icons/Entypo';
-import  MaterialIcons  from 'react-native-vector-icons/MaterialIcons';
+import { TouchableRipple } from 'react-native-paper';
 import  AntDesign  from 'react-native-vector-icons/AntDesign';
-import { Checkbox, TouchableRipple ,Snackbar} from 'react-native-paper';
-import { ApiServices } from '../services/Apiservices';
-import moment from 'moment';
+import  MaterialCommunityIcons  from 'react-native-vector-icons/MaterialCommunityIcons';
+import  Feather  from 'react-native-vector-icons/Feather';
+import { useSelector,useDispatch } from 'react-redux';
+import { addFoodItem, removeFoodItem } from '../Store/Store';
+
 
 const height = Dimensions.dev
-
+const width = Dimensions.width
 const HomeScrn = (props) =>{
-   const [selectedCatgry,setSelectedCatgry] =useState("Rockets");
-   const [menuDatas,setMenuData] = useState([])
-   const[visibleSnackBar,setVisibleSnackBar] = useState(false);
-   const[deletedTaskName,setDeletedTaskName] = useState('');
-   const checkTashFinshed = (index,listName) =>{
-      setTimeout(function(){
-       
-      },500)
-   }
-   
-   const setSelectedCatgryNme = (catagory) =>{
-       setSelectedCatgry(catagory)
-   }
-const onDismissSnackBar = () => setVisibleSnackBar(false);
 
-const updateMenuData = (menuData) =>{
- setMenuData(menuData)
- console.log(menuData[0])
+const [isViewCartDisabled,setIsViewCartDisabled] =useState(false);
+const [cartItemsCount,setCartItemsCount] = useState(0)
+const state = useSelector((state) => state);
+const dispatch = useDispatch();
+
+const getCartCount = () =>{
+return state.menuItems.reduce((acc,curr) => {
+  acc = acc+curr.addedCount;
+  return acc
+},0);
 }
 
-  const renderEachItemFromList =({item,index}) =>{
-      return(<View name="list-Content-hldr" style={{padding:10}}>
-        <TouchableRipple onPress={() =>{props.navigation.navigate("DetailsScrn",{item,selectedCatgry:selectedCatgry})}} style={{borderRadius:20}} borderless={false}>
-           <View name="list-content-container" style={{backgroundColor:'#6A5ACD',borderRadius:20,padding:10,flexDirection:'row'}}>
-           <View name="row1" style={{flex:1,alignItems:'center',justifyContent:'center'}}>
-              <View style={{height:40,width:40,borderColor:"red",borderWidth:1,borderRadius:50,backgroundColor:'#fff',alignItems:'center',justifyContent:'center'}}>
-               {selectedCatgry==="History"?<Text style={{fontSize:15,fontWeight:"bold",color:"#6A5ACD"}}>{item.title?item.title.slice(0,2).toUpperCase():""}</Text>:
-                <Text style={{fontSize:15,fontWeight:"bold",color:"#6A5ACD"}}>{item.name?item.name.slice(0,2).toUpperCase():""}</Text>}
-              </View>
-           </View>
+const addItem = (id)=>{
+  dispatch(addFoodItem({id}))
+ setCartItemsCount(getCartCount())
+}
 
-           <View name="row2" style={{flex:5}}>
-           <View style={{flexDirection:'row',alignItems:'center'}}>
-                <Text style={{color:"white",paddingLeft:5}}>{selectedCatgry === "History"?item.title:item.name}</Text>
-              </View>
-              <View  style={{flexDirection:'row',alignItems:'center',paddingTop:10}}>
-              <Text style={{color:"white",paddingLeft:5,fontSize:12}}>{moment(item.event_date_unix).format("ddd, MMM Do YYYY")}</Text>
-              </View>
-           </View>
-           <View name="row3" style={{flex:1.5,alignItems:'center',justifyContent:'center'}}>
-                <TouchableRipple style={{backgroundColor:"#fff",borderRadius:20,paddingHorizontal:10,paddingVertical:4}}>
-                  <Text style={{color:"#6A5ACD"}}>More</Text>
-                </TouchableRipple>
-           </View>
-           </View>
-        </TouchableRipple>
-      </View>)
-  }
-  
-  const listEmptyComponent = () =>{
-     return(
-      <View style={{flex:1,alignItems:'center',justifyContent:'center'}}>
-          <AntDesign name="frowno" size={104} color="#6A5ACD" />
-          <Text style={{fontSize:26,fontWeight:"bold",color:"#6A5ACD",paddingTop:20}}>Nothing</Text>
-          <Text style={{fontSize:26,fontWeight:"bold",color:"#6A5ACD"}}>in {selectedCatgry} !</Text>
+const removeItem = (id) =>{
+ dispatch(removeFoodItem({id}))
+ setCartItemsCount(getCartCount())
+}
+
+useEffect(()=>{
+  setCartItemsCount(getCartCount())
+console.log("homeeee")
+},[state])
+
+  const renderItem = ({item,index}) =>{
+    return(<View style={{width:"100%"}}>
+      <View style={{flex:1,flexDirection:"row",paddingBottom:15}}>
+        <View style={{flex:1}}>
+          
+          <View style={styles.specBoxStyle}>
+          <View style={styles.innerSpecBox}>
+            <Text style={styles.specTxt}>N</Text>
+          </View>
+          </View>
+          
+          <View style={styles.specBoxStyle}>
+          <View style={styles.innerSpecBox}>
+            <Text style={styles.specTxt}>D</Text>
+          </View>
+          </View>
+        </View>
+        <View style={{flex:8,paddingLeft:5}}>
+          <Text style={{fontSize:15,paddingVertical:5}}>{item.name}</Text>
+          <Text style={{fontSize:12,paddingVertical:5}}>{item.ingridnts}</Text>
+          <Text style={{fontSize:17,paddingVertical:5,color:"#ff9800"}}>${item.price}</Text>
+        </View>
+        <View style={{flex:3}}>
+          <View style={styles.addItemBox}>
+            <TouchableRipple onPress={() =>{removeItem(item.id)}}>
+              <AntDesign name="minus" size={16} color="black" />
+            </TouchableRipple>
+            <Text>{item.addedCount}</Text>
+            <TouchableRipple onPress={() =>{addItem(item.id)}}>
+             <AntDesign name="plus" size={16} color="black" />
+            </TouchableRipple>
+          </View>
+        </View>
       </View>
-     )
+    </View>)
   }
 
     return(
-        <View style={{flex:1,paddingTop:Platform.OS === "android"?StatusBar.currentHeight:"",backgroundColor:"#fff"}}>
-         <View name="Header-holder">
-             <Header setSelectedCatgryNme={setSelectedCatgryNme} navigation={props.navigation} updateMenuData={updateMenuData}></Header>
-             
-         </View>
-          <View name="content-container" style={{flex:1,position:'relative'}}>
-            <View name="task-container" style={{flex:1,position:'relative'}}>
-              <FlatList  contentContainerStyle={{ flexGrow: 1,paddingBottom:100 }} ListEmptyComponent={listEmptyComponent}  data={menuDatas} renderItem={renderEachItemFromList} keyExtractor={(item,index)=> index.toString()}/>
-
-            </View>
-          
-            <View name="bottom-txt-box" style={{flexDirection:'row',alignItems:'center',justifyContent:"center",paddingVertical:15,paddingHorizontal:15,backgroundColor:"#6A5ACD",width:'100%',position:'absolute',bottom:0}}>
-           <Text style={{color:"#fff",fontSize:16}}>SpaceX updations !</Text>
+        <View style={{position:"relative",flex:1,paddingTop:Platform.OS === "android"?StatusBar.currentHeight:"",backgroundColor:"#fff"}}>
+          <View style={{flex:1}}>
+             <View style={{flex:1}}>
+                <ImageBackground source={require('../components/assets/Images/food3.jpeg')} style={{position:"relative",flex:1,resizeMode: 'cover'}}>
+                  <View style={styles.bookBtnHldr}>
+                    <View style={styles.nameCard}>
+                        <Text style={{fontSize:22,paddingBottom:20}}>Inka Restaurant</Text>
+                        <Text style={{color:"grey"}}><AntDesign name="staro" size={10} color="black" /> 5.0(200+) | All days : 09:00 AM- 06:00 PM</Text>
+                        <Text style={{paddingBottom:20}}><Feather name="phone-call" size={17} color="black" />   React us at : 9845655667</Text>
+                    <TouchableRipple style={{borderRadius:5,backgroundColor:"#041c5e",paddingHorizontal:12,paddingVertical:6}}>
+                      <Text style={{color:"#fff"}}>BOOK A TABLE</Text>
+                    </TouchableRipple>
+                    </View>
+                  </View>
+                </ImageBackground>
+             </View>
+             <View style={{flex:2.5,paddingTop:120}}>
+                <View style={{flex:1,paddingTop:20,paddingHorizontal:20}}>
+                   <Text style={{fontSize:20,paddingBottom:20}}>Starter</Text>
+                   <FlatList showsVerticalScrollIndicator={false} data={state.menuItems}renderItem={renderItem} keyExtractor={(eachItem,index)=> index.toString()}></FlatList>
+                </View>
+             </View>
           </View>
-         </View>
-         <Snackbar duration={2000} visible={visibleSnackBar}  onDismiss={onDismissSnackBar}><Text style={{textAlign:'center',color:"#fff"}}></Text></Snackbar>
+          <TouchableRipple onPress={() =>{props.navigation.navigate("Cart")}} disabled={cartItemsCount > 0? false:true}>
+          <View name="bottom-bar" style={[styles.viewCrtBtn,{opacity:cartItemsCount > 0?10:0.7}]}>
+          <MaterialCommunityIcons name="cart-variant" size={24} color="#fff" style={{paddingRight:5}}/>
+                <Text style={{color:"#fff"}}>View Cart ({cartItemsCount} items)</Text>
+          </View>
+          </TouchableRipple>
         </View>
     )
 }
 
 export default HomeScrn;
+
+const styles= StyleSheet.create({
+  specBoxStyle : {
+    flexDirection:"row"
+    ,marginBottom:10,
+    alignItems:"flex-start",
+    justifyContent:"flex-start"
+  },
+  innerSpecBox:{height:25,
+    width:25,
+    borderColor:"gray",
+    borderWidth:0.5,
+    borderRadius:4,
+    alignItems:"center",
+    justifyContent:"center"
+  },
+  specTxt:{
+    textAlign:"left",
+  },
+  addItemBox:{
+    flexDirection:"row",
+    padding:4,
+    justifyContent:"space-between",
+    alignItems:"center",
+    borderColor:"#ff9800",
+    borderWidth:1
+  },
+  bookBtnHldr:{
+    padding:20,
+    height:200,
+    width:"100%",
+    position:"absolute",
+    bottom:-130
+  },
+  nameCard:{height:"100%",
+  width:"100%",
+  alignItems:"center",
+  justifyContent:"center",
+  borderRadius:5,
+  backgroundColor:"#fff", 
+  shadowColor: '#000',
+  shadowOffset: { width: 1, height: 1 },
+  shadowOpacity:  0.4,
+  shadowRadius: 3,
+  elevation: 5},
+  viewCrtBtn:{
+    bottom:0,
+    width:"100%",
+    height:45,
+    backgroundColor:"#041c5e",
+    flexDirection:"row",
+    alignItems:"center",
+    justifyContent:"center"
+  }
+})

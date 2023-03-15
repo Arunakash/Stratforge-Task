@@ -7,7 +7,7 @@ import App from './App';
 import React, { Component } from 'react';
 import {name as appName} from './app.json';
 import { Provider } from 'react-redux';
-import { store } from './src/components/Store/Store';
+import { store } from './src/Store/Store';
 
 
 class MyApp extends Component {

@@ -7,11 +7,9 @@ const SplaScreen = (props) =>{
     const[isAuth,setIsAuth] = useState(false)
     const getAuth =  async () =>{
       const auth = JSON.parse(await AsyncStorage.getItem('userAuthValue'));
-      if(auth){
+  
        setTimeout(()=>{props.navigation.replace("Home")},1000)
-      }else{
-        setTimeout(()=>{props.navigation.replace("SignIn")},1000)
-      }
+     
     }
     useEffect(() => {
       StatusBar.setBarStyle('dark-content',true)
@@ -20,7 +18,7 @@ const SplaScreen = (props) =>{
       getAuth()
     },[])
     return(<View style={{flex:1,alignItems:'center',justifyContent:'center'}}>
-        <Text style={{fontSize:18,fontWeight:'bold',color:"#6A5ACD"}}>SpaceX</Text>
+        <Text style={{fontSize:18,fontWeight:'bold',color:"#6A5ACD"}}>Foodie</Text>
     </View>)
 }
 
